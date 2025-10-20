@@ -3,8 +3,10 @@ const subtract = (a, b) => a - b;
 const multiply = (a, b) => a * b;
 const divide = (a, b) => a / b;
 
-let numberA = 0;
-let numberB = 0;
+let numberAStr = "";
+let numberBStr = "";
+let isFirstOperation = true;
+
 let operator;
 
 const operate = (operator, numberA, numberB) => {
@@ -23,7 +25,7 @@ const operate = (operator, numberA, numberB) => {
       result = divide(numberA, numberB);
       break;
     default:
-      console.log("Invalid operator:", operator)
+      console.log(`Invalid operator:`, operator, numberA, numberB)
   }
   return result;
 }
@@ -33,10 +35,79 @@ const displayTxt = display.querySelector(".display-txt");
 
 const buttonCalcs = document.querySelectorAll(".btn-calc");
 buttonCalcs.forEach(buttonCalc => {
-  buttonCalc.addEventListener("click", e => {
-    alert(e.target.id);
-  })
+  buttonCalc.addEventListener("click", (e) => {
+    if (isOperator(e.target.id)) {
+      if (operator === "=") {
+        operator = e.target.id;
+        return;
+      }
+
+      if (isFirstOperation) {
+        operator = e.target.id;
+        isFirstOperation = false;
+      } else {
+        if (operator === "/" && numberBStr == "0") {
+          renderText("Cannot Divide by 0!");
+          operator = "";
+          numberAStr = "";
+          numberBStr = "";
+          isFirstOperation = true;
+          return;
+        }
+
+        const numberA = Number(numberAStr);
+        const numberB = Number(numberBStr);
+        const result = operate(operator, numberA, numberB);
+        renderText(result);
+        numberAStr = "" + result;
+        operator = e.target.id;
+        numberBStr = "";
+      }
+    } else if (isNumber(e.target.id)) {
+      if (isFirstOperation) {
+        numberAStr += e.target.id;
+        renderText(numberAStr);
+      } else {
+        numberBStr += e.target.id;
+        renderText(numberBStr);
+      }
+    } else {
+      if (e.target.id === "=") {
+        const numberA = Number(numberAStr);
+        const numberB = Number(numberBStr);
+        const result = operate(operator, numberA, numberB);
+        renderText(result);
+        numberAStr = "" + result;
+        operator = "";
+        numberBStr = "";
+        isFirstOperation = true;
+
+        return;
+      } else if (e.target.id === "clear") {
+        operator = "";
+        numberAStr = "";
+        numberBStr = "";
+        isFirstOperation = true;
+        renderText("")
+      } else if (e.target.id === "delete") {
+        alert("boom")
+      }
+    }
+  });
 });
+
+const clearDisplay = () => {
+
+}
+
+const isOperator = (id) => {
+  return "+ - / * =".includes(id);
+}
+
+const isNumber = (id) => {
+  return "0123456789".includes(id);
+}
+
 
 const renderText = (text) => {
   displayTxt.innerHTML = "";
