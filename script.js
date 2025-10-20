@@ -30,4 +30,15 @@ const operate = (operator, numberA, numberB) => {
 
 const display = document.querySelector(".display");
 const displayTxt = display.querySelector(".display-txt");
-displayTxt.textContent = "122"
+
+const buttonCalcs = document.querySelectorAll(".btn-calc");
+buttonCalcs.forEach(buttonCalc => {
+  buttonCalc.addEventListener("click", e => {
+    alert(e.target.id);
+  })
+});
+
+const renderText = (text) => {
+  displayTxt.innerHTML = "";
+  displayTxt.textContent = text;
+}
