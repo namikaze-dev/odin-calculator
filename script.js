@@ -6,6 +6,7 @@ const divide = (a, b) => a / b;
 let numberAStr = "";
 let numberBStr = "";
 let isFirstOperation = true;
+let isResultDisplayed = false;
 
 let operator;
 
@@ -39,6 +40,8 @@ buttonCalcs.forEach(buttonCalc => {
     if (isOperator(e.target.id)) {
       if (operator === "=") {
         operator = e.target.id;
+        isFirstOperation = false;
+        isResultDisplayed = false;
         return;
       }
 
@@ -59,11 +62,21 @@ buttonCalcs.forEach(buttonCalc => {
         const numberB = Number(numberBStr);
         const result = operate(operator, numberA, numberB);
         renderText(result);
-        numberAStr = "" + result;
+        numberAStr = `${result}`;
         operator = e.target.id;
         numberBStr = "";
       }
     } else if (isNumber(e.target.id)) {
+      if (isResultDisplayed) {
+        numberAStr = e.target.id;
+        numberBStr = "";
+        operator = "";
+        renderText(numberAStr);
+        isFirstOperation = true;
+        isResultDisplayed = false;
+        return;
+      }
+
       if (isFirstOperation) {
         numberAStr += e.target.id;
         renderText(numberAStr);
@@ -77,11 +90,11 @@ buttonCalcs.forEach(buttonCalc => {
         const numberB = Number(numberBStr);
         const result = operate(operator, numberA, numberB);
         renderText(result);
-        numberAStr = "" + result;
-        operator = "";
+        numberAStr = `${result}`;
+        operator = "=";
         numberBStr = "";
         isFirstOperation = true;
-
+        isResultDisplayed = true;
         return;
       } else if (e.target.id === "clear") {
         operator = "";
@@ -96,12 +109,8 @@ buttonCalcs.forEach(buttonCalc => {
   });
 });
 
-const clearDisplay = () => {
-
-}
-
 const isOperator = (id) => {
-  return "+ - / * =".includes(id);
+  return "+ - / *".includes(id);
 }
 
 const isNumber = (id) => {
