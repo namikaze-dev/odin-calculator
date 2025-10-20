@@ -49,15 +49,6 @@ buttonCalcs.forEach(buttonCalc => {
         operator = e.target.id;
         isFirstOperation = false;
       } else {
-        if (operator === "/" && numberBStr == "0") {
-          renderText("Cannot Divide by 0!");
-          operator = "";
-          numberAStr = "";
-          numberBStr = "";
-          isFirstOperation = true;
-          return;
-        }
-
         const numberA = Number(numberAStr);
         const numberB = Number(numberBStr);
         const result = operate(operator, numberA, numberB);
@@ -65,8 +56,20 @@ buttonCalcs.forEach(buttonCalc => {
         numberAStr = `${result}`;
         operator = e.target.id;
         numberBStr = "";
+
+        const buttonDot = document.querySelector("#dot");
+        buttonDot.classList.toggle("disable-btn", false);
       }
     } else if (isNumber(e.target.id)) {
+      if (operator === "/" && e.target.id === "0") {
+        renderText("Cannot Divide by 0!");
+        operator = "";
+        numberAStr = "";
+        numberBStr = "";
+        isFirstOperation = true;
+        return;
+      }
+
       if (isResultDisplayed) {
         numberAStr = e.target.id;
         numberBStr = "";
@@ -95,6 +98,10 @@ buttonCalcs.forEach(buttonCalc => {
         numberBStr = "";
         isFirstOperation = true;
         isResultDisplayed = true;
+
+        const buttonDot = document.querySelector("#dot");
+        buttonDot.classList.toggle("disable-btn", false);
+
         return;
       } else if (e.target.id === "clear") {
         operator = "";
@@ -102,12 +109,40 @@ buttonCalcs.forEach(buttonCalc => {
         numberBStr = "";
         isFirstOperation = true;
         renderText("")
+
+        const buttonDot = document.querySelector("#dot");
+        buttonDot.classList.toggle("disable-btn", false);
       } else if (e.target.id === "delete") {
-        alert("boom")
+        handleBackSpace();
+      } else if (e.target.id === "dot") {
+        handleFloatingPoint();
       }
     }
   });
 });
+
+const handleBackSpace = () => {
+  if (isFirstOperation) {
+    numberAStr = numberAStr.slice(0, -1);
+    renderText(numberAStr);
+  } else {
+    numberBStr = numberBStr.slice(0, -1);
+    renderText(numberAStr);
+  }
+}
+
+const handleFloatingPoint = () => {
+  const buttonDot = document.querySelector("#dot");
+  buttonDot.classList.toggle("disable-btn", true);
+  console.log(buttonDot)
+  if (isFirstOperation) {
+    numberAStr += ".";
+    renderText(numberAStr);
+  } else {
+    numberBStr += ".";
+    renderText(numberAStr);
+  }
+}
 
 const isOperator = (id) => {
   return "+ - / *".includes(id);

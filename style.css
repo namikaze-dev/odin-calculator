@@ -57,7 +57,7 @@ footer p {
   background-color: white;
 }
 
-.btn-calc:hover {
+.btn-calc:hover, .disable-btn {
   background-color: lightgrey;
   color: whitesmoke;
   border-color: white;
