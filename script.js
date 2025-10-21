@@ -5,9 +5,7 @@ const divide = (a, b) => a / b;
 
 let numberAStr = "";
 let numberBStr = "";
-let isFirstOperation = true;
-let isResultDisplayed = false;
-
+let numberCurr = "";
 let operator;
 
 const operate = (operator, numberA, numberB) => {
@@ -37,115 +35,87 @@ const displayTxt = display.querySelector(".display-txt");
 const buttonCalcs = document.querySelectorAll(".btn-calc");
 buttonCalcs.forEach(buttonCalc => {
   buttonCalc.addEventListener("click", (e) => {
+    // Handle number button click
+    if (isNumber(e.target.id)) {
+      // Check for zero division
+      if (e.target.id === "0" && operator === "/") {
+        renderText("Cannot Divide by 0!");
+        clearState();
+        return;
+      }
+
+      numberCurr += e.target.id;
+      renderText(numberCurr);
+    }
+
+    // Handle operator button click
     if (isOperator(e.target.id)) {
+      const buttonDot = document.querySelector("#dot");
+      buttonDot.classList.toggle("disable-btn", false);
+
       if (operator === "=") {
         operator = e.target.id;
-        isFirstOperation = false;
-        isResultDisplayed = false;
         return;
       }
 
+      const isFirstOperation = numberAStr === "";
       if (isFirstOperation) {
         operator = e.target.id;
-        isFirstOperation = false;
-      } else {
-        const numberA = Number(numberAStr);
-        const numberB = Number(numberBStr);
-        const result = operate(operator, numberA, numberB);
-        renderText(result);
-        numberAStr = `${result}`;
-        operator = e.target.id;
-        numberBStr = "";
-
-        const buttonDot = document.querySelector("#dot");
-        buttonDot.classList.toggle("disable-btn", false);
-      }
-    } else if (isNumber(e.target.id)) {
-      if (operator === "/" && e.target.id === "0") {
-        renderText("Cannot Divide by 0!");
-        operator = "";
-        numberAStr = "";
-        numberBStr = "";
-        isFirstOperation = true;
+        numberAStr = numberCurr;
+        numberCurr = "";
         return;
       }
 
-      if (isResultDisplayed) {
-        numberAStr = e.target.id;
-        numberBStr = "";
-        operator = "";
-        renderText(numberAStr);
-        isFirstOperation = true;
-        isResultDisplayed = false;
-        return;
-      }
+      numberBStr = numberCurr;
+      numberCurr = "";
+      const numberA = Number(numberAStr);
+      const numberB = Number(numberBStr);
+      const result = operate(operator, numberA, numberB);
+      renderText(result);
+      numberAStr = `${result}`;
+      operator = e.target.id;
+      numberBStr = "";
+    }
 
-      if (isFirstOperation) {
-        numberAStr += e.target.id;
-        renderText(numberAStr);
-      } else {
-        numberBStr += e.target.id;
-        renderText(numberBStr);
-      }
-    } else {
-      if (e.target.id === "=") {
-        const numberA = Number(numberAStr);
-        const numberB = Number(numberBStr);
-        const result = operate(operator, numberA, numberB);
-        renderText(result);
-        numberAStr = `${result}`;
-        operator = "=";
-        numberBStr = "";
-        isFirstOperation = true;
-        isResultDisplayed = true;
+    if (e.target.id === "clear") {
+      operator = "";
+      numberAStr = "";
+      numberBStr = "";
+      isFirstOperation = true;
+      renderText("")
+    }
 
-        const buttonDot = document.querySelector("#dot");
-        buttonDot.classList.toggle("disable-btn", false);
+    if (e.target.id === "delete") {
+      handleBackSpace();
+    }
 
-        return;
-      } else if (e.target.id === "clear") {
-        operator = "";
-        numberAStr = "";
-        numberBStr = "";
-        isFirstOperation = true;
-        renderText("")
-
-        const buttonDot = document.querySelector("#dot");
-        buttonDot.classList.toggle("disable-btn", false);
-      } else if (e.target.id === "delete") {
-        handleBackSpace();
-      } else if (e.target.id === "dot") {
-        handleFloatingPoint();
-      }
+    if (e.target.id === "dot") {
+      handleFloatingPoint();
     }
   });
 });
 
 const handleBackSpace = () => {
-  if (isFirstOperation) {
-    numberAStr = numberAStr.slice(0, -1);
-    renderText(numberAStr);
-  } else {
-    numberBStr = numberBStr.slice(0, -1);
-    renderText(numberAStr);
-  }
+  numberCurr = numberCurr.slice(0, -1);
+  renderText(numberCurr);
 }
 
 const handleFloatingPoint = () => {
   const buttonDot = document.querySelector("#dot");
   buttonDot.classList.toggle("disable-btn", true);
-  console.log(buttonDot)
-  if (isFirstOperation) {
-    numberAStr += ".";
-    renderText(numberAStr);
-  } else {
-    numberBStr += ".";
-    renderText(numberAStr);
-  }
+  numberCurr += ".";
+  renderText(numberCurr);
+}
+
+const clearState = () => {
+  operator = "";
+  numberAStr = "";
+  numberBStr = "";
+  numberCurr = "";
 }
 
 const isOperator = (id) => {
-  return "+ - / *".includes(id);
+  return "+ - / * =".includes(id);
 }
 
 const isNumber = (id) => {
